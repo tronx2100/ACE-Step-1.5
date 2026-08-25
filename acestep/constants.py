@@ -41,6 +41,12 @@ for note in KEYSCALE_NOTES:
         for mode in KEYSCALE_MODES:
             VALID_KEYSCALES.add(f"{note}{acc} {mode}")
 
+# Curated chromatic subset (12 semitones x major/minor) for the keyscale
+# dropdown: a readable list instead of all 70 VALID_KEYSCALES combinations
+# (which include redundant accidental spellings, e.g. "C#" and "C♯").
+_CHROMATIC_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+KEYSCALE_CHOICES = [f"{note} {mode}" for note in _CHROMATIC_NOTES for mode in KEYSCALE_MODES]
+
 
 # ==============================================================================
 # Metadata Range Constants

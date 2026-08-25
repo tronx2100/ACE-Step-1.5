@@ -127,7 +127,12 @@ class LLMHandler:
         try:
             if self.llm_backend == "vllm":
                 try:
-                    if hasattr(self.llm, "reset"):
+                    # exit() releases the model weights and KV cache tensor
+                    # from GPU memory; reset() only clears scheduler queue
+                    # state and leaves the multi-GB GPU footprint resident.
+                    if hasattr(self.llm, "exit"):
+                        self.llm.exit()
+                    elif hasattr(self.llm, "reset"):
                         self.llm.reset()
                 except Exception:
                     pass
@@ -2326,7 +2331,14 @@ class LLMHandler:
                 "target_duration": None,  # No duration constraint for generation length
                 "user_metadata": constrained_metadata,  # Inject user-provided metadata
                 "skip_caption": False,  # Generate caption
-                "skip_language": constrained_metadata.get('language') is not None if constrained_metadata else False,
+                # Never skip the language field here: when a language is user-provided,
+                # set_user_metadata()'s token-injection path forces that exact value into
+                # the output (see MetadataConstrainedLogitsProcessor), but only if the FSM
+                # actually visits the LANGUAGE_NAME/VALUE states. Skipping omits the field
+                # from the output entirely, so callers reading result.language back get an
+                # empty string instead of the forced value (e.g. the Gradio "vocal language"
+                # dropdown reverting to Auto after Format/Enhance).
+                "skip_language": False,
                 "skip_genres": False,  # Generate genres
                 "generation_phase": "understand",  # Use understand phase for metadata + free-form lyrics
                 "caption": "",

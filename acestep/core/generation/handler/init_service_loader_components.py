@@ -50,6 +50,12 @@ class InitServiceLoaderComponentsMixin:
         if not os.path.exists(vae_checkpoint_path):
             raise FileNotFoundError(f"VAE checkpoint not found at {vae_checkpoint_path}")
 
+        if torch.cuda.is_available():
+            if getattr(self, "vae", None) is not None:
+                del self.vae
+                self.vae = None
+            torch.cuda.empty_cache()
+
         self.vae = AutoencoderOobleck.from_pretrained(vae_checkpoint_path)
         if not self.offload_to_cpu:
             vae_dtype = self._get_vae_dtype(device)
@@ -90,6 +96,12 @@ class InitServiceLoaderComponentsMixin:
         text_encoder_path = os.path.join(checkpoint_dir, "Qwen3-Embedding-0.6B")
         if not os.path.exists(text_encoder_path):
             raise FileNotFoundError(f"Text encoder not found at {text_encoder_path}")
+
+        if torch.cuda.is_available():
+            if getattr(self, "text_encoder", None) is not None:
+                del self.text_encoder
+                self.text_encoder = None
+            torch.cuda.empty_cache()
 
         self.text_tokenizer = AutoTokenizer.from_pretrained(text_encoder_path)
         self.text_encoder = AutoModel.from_pretrained(text_encoder_path)

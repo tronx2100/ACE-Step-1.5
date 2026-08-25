@@ -22,8 +22,8 @@ def register_generation_text_format_handlers(
 
     # ========== Format Caption Button ==========
     generation_section["format_caption_btn"].click(
-        fn=lambda caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug: gen_h.handle_format_caption(
-            llm_handler, caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug
+        fn=lambda caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug, vocal_lang: gen_h.handle_format_caption(
+            llm_handler, caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug, vocal_lang
         ),
         inputs=[
             generation_section["captions"],
@@ -36,6 +36,7 @@ def register_generation_text_format_handlers(
             generation_section["lm_top_k"],
             generation_section["lm_top_p"],
             generation_section["constrained_decoding_debug"],
+            generation_section["vocal_language"],
         ],
         outputs=[
             generation_section["captions"],
@@ -93,8 +94,8 @@ def register_generation_text_format_handlers(
 
     # ========== Format Lyrics Button ==========
     generation_section["format_lyrics_btn"].click(
-        fn=lambda caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug: gen_h.handle_format_lyrics(
-            llm_handler, caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug
+        fn=lambda caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug, vocal_lang: gen_h.handle_format_lyrics(
+            llm_handler, caption, lyrics, bpm, duration, key_scale, time_sig, temp, top_k, top_p, debug, vocal_lang
         ),
         inputs=[
             generation_section["captions"],
@@ -107,6 +108,7 @@ def register_generation_text_format_handlers(
             generation_section["lm_top_k"],
             generation_section["lm_top_p"],
             generation_section["constrained_decoding_debug"],
+            generation_section["vocal_language"],
         ],
         outputs=[
             generation_section["lyrics"],

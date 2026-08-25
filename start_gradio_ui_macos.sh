@@ -90,7 +90,7 @@ SHARE="${SHARE:-}"
 
 # Reset LANGUAGE if it contains an invalid value (e.g. system locale like en_CA:en)
 case "${LANGUAGE:-}" in
-    en|zh|he|ja) ;;
+    en|zh|he|ja|de) ;;
     *) unset LANGUAGE ;;
 esac
 # UI language: en, zh, he, ja

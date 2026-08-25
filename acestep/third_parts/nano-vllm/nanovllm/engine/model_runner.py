@@ -240,7 +240,16 @@ class ModelRunner:
                 self.shm.unlink()
         if not self.enforce_eager:
             del self.graphs, self.graph_pool
+        # Release model weights and the pre-allocated KV cache tensor: neither
+        # was freed here before, so every LM re-initialization left the full
+        # GPU footprint (weights + KV cache, several GB) permanently reserved,
+        # starving subsequent DiT/VAE reloads of VRAM.
+        if hasattr(self, "kv_cache"):
+            del self.kv_cache
+        if hasattr(self, "model"):
+            del self.model
         torch.cuda.synchronize()
+        torch.cuda.empty_cache()
         dist_utils.destroy_process_group()
 
     def loop(self):

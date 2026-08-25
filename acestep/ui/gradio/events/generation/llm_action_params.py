@@ -20,6 +20,7 @@ def build_user_metadata(
     audio_duration: Optional[Union[float, int, str]],
     key_scale: Optional[str],
     time_signature: Optional[str],
+    vocal_language: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """Build constrained-decoding metadata from optional manual inputs."""
     user_metadata: Dict[str, Any] = {}
@@ -32,6 +33,8 @@ def build_user_metadata(
         user_metadata["keyscale"] = key_scale.strip()
     if time_signature and time_signature.strip():
         user_metadata["timesignature"] = time_signature.strip()
+    if vocal_language and vocal_language.strip() and vocal_language.strip().lower() != "unknown":
+        user_metadata["language"] = vocal_language.strip()
     return user_metadata if user_metadata else None
 
 

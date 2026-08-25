@@ -543,7 +543,12 @@ def main():
                         args.init_llm = False
 
                 if args.init_llm and args.lm_model_path:
-                    checkpoint_dir = os.path.join(project_root, "checkpoints")
+                    env_ckpt = os.environ.get("ACESTEP_CHECKPOINTS_DIR")
+                    if env_ckpt:
+                        from acestep.model_downloader import get_checkpoints_dir
+                        checkpoint_dir = str(get_checkpoints_dir())
+                    else:
+                        checkpoint_dir = os.path.join(project_root, "checkpoints")
 
                     # Ensure LM model is downloaded before initialization
                     prefer_source = None

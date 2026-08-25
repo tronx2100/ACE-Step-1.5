@@ -4,7 +4,7 @@ from typing import Any
 
 import gradio as gr
 
-from acestep.constants import VALID_LANGUAGES
+from acestep.constants import KEYSCALE_CHOICES, VALID_LANGUAGES
 from acestep.ui.gradio.i18n import t
 
 
@@ -41,10 +41,11 @@ def build_optional_parameter_controls(
                 elem_classes=["has-info-container"],
                 interactive=False,
             )
-            key_scale = gr.Textbox(
-                label=t("generation.keyscale_label"),
-                placeholder=t("generation.keyscale_placeholder"),
+            key_scale = gr.Dropdown(
+                choices=[""] + KEYSCALE_CHOICES,
                 value="",
+                label=t("generation.keyscale_label"),
+                allow_custom_value=True,
                 info=t("generation.keyscale_info"),
                 elem_classes=["has-info-container"],
                 interactive=False,

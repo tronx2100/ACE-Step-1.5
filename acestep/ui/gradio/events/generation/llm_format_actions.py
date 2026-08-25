@@ -39,6 +39,7 @@ def _execute_format_sample(
     lm_top_k: int,
     lm_top_p: float,
     constrained_decoding_debug: bool,
+    vocal_language: Optional[str] = None,
 ):
     """Run shared format-sample workflow.
 
@@ -50,7 +51,7 @@ def _execute_format_sample(
         gr.Warning(status_message)
         return None, None, status_message
 
-    user_metadata = build_user_metadata(bpm, audio_duration, key_scale, time_signature)
+    user_metadata = build_user_metadata(bpm, audio_duration, key_scale, time_signature, vocal_language)
     top_k_value, top_p_value = convert_lm_params(lm_top_k, lm_top_p)
 
     result = format_sample(
@@ -88,6 +89,7 @@ def handle_format_sample(
     lm_top_k: int,
     lm_top_p: float,
     constrained_decoding_debug: bool = False,
+    vocal_language: Optional[str] = None,
 ):
     """Format caption and lyrics together via LLM."""
     result, duration_value, status_message = _execute_format_sample(
@@ -102,6 +104,7 @@ def handle_format_sample(
         lm_top_k=lm_top_k,
         lm_top_p=lm_top_p,
         constrained_decoding_debug=constrained_decoding_debug,
+        vocal_language=vocal_language,
     )
 
     if result is None:
@@ -132,6 +135,7 @@ def handle_format_caption(
     lm_top_k: int,
     lm_top_p: float,
     constrained_decoding_debug: bool = False,
+    vocal_language: Optional[str] = None,
 ):
     """Format only caption via LLM while leaving lyrics unchanged in UI wiring.
 
@@ -150,6 +154,7 @@ def handle_format_caption(
         lm_top_k=lm_top_k,
         lm_top_p=lm_top_p,
         constrained_decoding_debug=constrained_decoding_debug,
+        vocal_language=vocal_language,
     )
 
     if result is None:
@@ -179,6 +184,7 @@ def handle_format_lyrics(
     lm_top_k: int,
     lm_top_p: float,
     constrained_decoding_debug: bool = False,
+    vocal_language: Optional[str] = None,
 ):
     """Format only lyrics via LLM while leaving caption unchanged in UI wiring.
 
@@ -197,6 +203,7 @@ def handle_format_lyrics(
         lm_top_k=lm_top_k,
         lm_top_p=lm_top_p,
         constrained_decoding_debug=constrained_decoding_debug,
+        vocal_language=vocal_language,
     )
 
     if result is None:

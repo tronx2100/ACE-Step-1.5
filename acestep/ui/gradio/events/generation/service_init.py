@@ -124,6 +124,13 @@ def init_service_wrapper(
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.dirname(current_file))))))
 
+    # Release any previously-loaded LM (e.g. vLLM engine) before reloading the
+    # main model: unload() is never called elsewhere, so on repeated
+    # re-initialization the old LM's GPU memory stayed reserved forever,
+    # leaving no headroom for the DiT/VAE reload below and causing OOM.
+    if llm_handler is not None and getattr(llm_handler, "llm_initialized", False):
+        llm_handler.unload()
+
     status, enable = dit_handler.initialize_service(
         project_root, config_path, device,
         use_flash_attention=use_flash_attention, compile_model=compile_model,
@@ -133,7 +140,12 @@ def init_service_wrapper(
     )
 
     if init_llm:
-        checkpoint_dir = os.path.join(project_root, "checkpoints")
+        env_ckpt = os.environ.get("ACESTEP_CHECKPOINTS_DIR")
+        if env_ckpt:
+            from acestep.model_downloader import get_checkpoints_dir
+            checkpoint_dir = str(get_checkpoints_dir())
+        else:
+            checkpoint_dir = os.path.join(project_root, "checkpoints")
 
         lm_status, lm_success = llm_handler.initialize(
             checkpoint_dir=checkpoint_dir,

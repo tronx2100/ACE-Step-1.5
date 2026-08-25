@@ -59,6 +59,9 @@ _load_env_file() {
             ACESTEP_BATCH_SIZE)
                 [[ -n "$value" ]] && BATCH_SIZE="--batch_size $value"
                 ;;
+            ACESTEP_CHECKPOINTS_DIR)
+                [[ -n "$value" ]] && export ACESTEP_CHECKPOINTS_DIR="$value"
+                ;;
         esac
     done < "$env_file"
     
@@ -81,7 +84,7 @@ SHARE="${SHARE:-}"
 
 # Reset LANGUAGE if it contains an invalid value (e.g. system locale like en_CA:en)
 case "$LANGUAGE" in
-    en|zh|he|ja) ;;
+    en|zh|he|ja|de) ;;
     *) unset LANGUAGE ;;
 esac
 # UI language: en, zh, he, ja
