@@ -6,6 +6,38 @@ Handler wrapper connecting model and UI
 import os
 import sys
 
+
+def _fix_cuda_lib_path_and_reexec():
+    """Re-exec with the venv's own CUDA libs first on LD_LIBRARY_PATH, if needed.
+
+    Must run before torch (or anything else CUDA-related) is imported: once
+    the process has started, a wrong LD_LIBRARY_PATH can cause CUDA calls to
+    silently resolve to a mismatched mix of library versions and crash with
+    CUBLAS_STATUS_INVALID_VALUE. See acestep/_cuda_lib_env.py for why.
+    """
+    if os.environ.get("ACESTEP_CUDA_LIBPATH_FIXED") == "1":
+        return
+    if sys.platform != "linux":
+        return
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from acestep._cuda_lib_env import venv_cuda_lib_dirs
+
+    lib_dirs = venv_cuda_lib_dirs()
+    if not lib_dirs:
+        os.environ["ACESTEP_CUDA_LIBPATH_FIXED"] = "1"
+        return
+    prefix = ":".join(lib_dirs)
+    current = os.environ.get("LD_LIBRARY_PATH", "")
+    if current.startswith(prefix):
+        os.environ["ACESTEP_CUDA_LIBPATH_FIXED"] = "1"
+        return
+    os.environ["LD_LIBRARY_PATH"] = f"{prefix}:{current}"
+    os.environ["ACESTEP_CUDA_LIBPATH_FIXED"] = "1"
+    os.execve(sys.executable, [sys.executable] + sys.argv, os.environ)
+
+
+_fix_cuda_lib_path_and_reexec()
+
 # Load environment variables from .env file at most once per process to avoid
 # epoch-boundary stalls (e.g. on Windows when Gradio yields during training)
 _env_loaded = False  # module-level so we never reload .env in the same process
