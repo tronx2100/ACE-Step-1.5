@@ -329,7 +329,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,
         "offload_dit_to_cpu_default": True,
         "quantization_default": True,  # INT8 essential to fit DiT in ~4GB
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {},
     },
     "tier2": {  # 4-6GB
@@ -348,7 +348,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,
         "offload_dit_to_cpu_default": True,
         "quantization_default": True,
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {},
     },
     "tier3": {  # 6-8GB
@@ -367,7 +367,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,
         "offload_dit_to_cpu_default": True,
         "quantization_default": True,
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3},
     },
     "tier4": {  # 8-12GB
@@ -385,7 +385,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,
         "offload_dit_to_cpu_default": True,
         "quantization_default": True,
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3},
     },
     "tier5": {  # 12-16GB
@@ -403,7 +403,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,
         "offload_dit_to_cpu_default": False,  # 12-16GB can keep DiT on GPU
         "quantization_default": True,
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3, "1.7B": 8},
     },
     "tier6a": {  # 16-20GB (e.g., RTX 4060 Ti 16GB, RTX 3080 16GB)
@@ -422,7 +422,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": True,  # Still offload VAE/TextEnc to save VRAM for LM
         "offload_dit_to_cpu_default": False,
         "quantization_default": True,
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3, "1.7B": 8},
     },
     "tier6b": {  # 20-24GB (e.g., RTX 3090, RTX 4090)
@@ -444,7 +444,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": False,  # 20-24GB can hold all models
         "offload_dit_to_cpu_default": False,
         "quantization_default": False,  # Enough VRAM, quantization optional
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3, "1.7B": 8, "4B": 12},
     },
     "unlimited": {  # >= 24GB
@@ -464,7 +464,7 @@ GPU_TIER_CONFIGS = {
         "offload_to_cpu_default": False,
         "offload_dit_to_cpu_default": False,
         "quantization_default": False,  # Plenty of VRAM
-        "compile_model_default": True,
+        "compile_model_default": False,
         "lm_memory_gb": {"0.6B": 3, "1.7B": 8, "4B": 12},
     },
 }
@@ -881,7 +881,7 @@ def get_gpu_config(gpu_memory_gb: Optional[float] = None) -> GPUConfig:
         # default to False — user can opt in via the UI checkbox.
         compile_model_default=False
         if _mps
-        else config.get("compile_model_default", True),
+        else config.get("compile_model_default", False),
         lm_memory_gb=config["lm_memory_gb"],
         # MPS: auto-tune MLX VAE decode chunk size based on unified memory
         mlx_vae_chunk_size=_auto_mlx_vae_chunk_size(gpu_memory_gb)
@@ -1172,7 +1172,7 @@ def compute_adaptive_config(total_vram_gb: float, dit_type: str = "turbo") -> GP
         offload_to_cpu_default=tier_config.get("offload_to_cpu_default", True),
         offload_dit_to_cpu_default=tier_config.get("offload_dit_to_cpu_default", True),
         quantization_default=tier_config.get("quantization_default", True),
-        compile_model_default=tier_config.get("compile_model_default", True),
+        compile_model_default=tier_config.get("compile_model_default", False),
         lm_memory_gb=lm_memory_gb,
     )
     return _apply_lm_backend_compatibility_overrides(config)
@@ -1546,7 +1546,7 @@ def get_gpu_config_for_tier(tier: str) -> GPUConfig:
         else config.get("quantization_default", True),
         compile_model_default=False
         if _mps
-        else config.get("compile_model_default", True),
+        else config.get("compile_model_default", False),
         lm_memory_gb=config["lm_memory_gb"],
         mlx_vae_chunk_size=_auto_mlx_vae_chunk_size(real_gpu_memory)
         if _mps
