@@ -5,8 +5,10 @@ entry points used by the Gradio generation UI.
 """
 
 import gradio as gr
+from loguru import logger
 
 from acestep.inference import understand_music
+from acestep.local_transcription import transcribe_lyrics_locally
 from acestep.ui.gradio.i18n import t
 
 from .validation import _contains_audio_code_tokens, clamp_duration_to_gpu_limit
@@ -97,11 +99,29 @@ def analyze_src_audio(
         )
 
     clamped_duration = clamp_duration_to_gpu_limit(result.duration, llm_handler)
+
+    # The LM reconstructs lyrics from audio codes, which captures style/
+    # structure but frequently gets the actual sung words wrong. A local
+    # Whisper pass over the real source audio gives much more accurate
+    # lyrics; fall back to the LM's guess if it fails for any reason.
+    lyrics = result.lyrics
+    try:
+        # Don't pass the LM's detected language as a hint: it has been
+        # observed to misidentify the language entirely (e.g. tagging a
+        # German vocal as Lithuanian), which then degrades Whisper's own
+        # transcription. Whisper's built-in auto-detection is more reliable
+        # here than trusting the LM's guess.
+        transcribed = transcribe_lyrics_locally(src_audio)
+        if transcribed:
+            lyrics = transcribed
+    except Exception as exc:
+        logger.warning(f"[analyze_src_audio] Local lyrics transcription failed, using LM lyrics: {exc}")
+
     return (
         codes_string,
         result.status_message,
         result.caption,
-        result.lyrics,
+        lyrics,
         result.bpm,
         clamped_duration,
         result.keyscale,
