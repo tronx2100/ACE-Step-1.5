@@ -19,6 +19,16 @@
     </a>
 </p>
 
+## 🍴 About this fork
+
+This is a fork of [ace-step/ACE-Step-1.5](https://github.com/ace-step/ACE-Step-1.5) with a few local fixes and additions on top of upstream:
+
+- German (`de`) UI localization, plus a `start.sh` launcher (kills any stale process on the target port, then opens the browser automatically once the server is up).
+- `ACESTEP_CHECKPOINTS_DIR` is now respected consistently everywhere models get loaded/downloaded — previously a couple of call sites built the checkpoint path from `project_root` directly, silently ignoring the env var and re-downloading models into the wrong folder.
+- Fixed a persistent GPU memory leak in the 5Hz LM (nano-vllm) backend: re-initializing the service never freed the previous LM's model weights/KV cache, so repeated re-inits (e.g. switching VAE) eventually ran out of VRAM.
+- The VAE/text encoder are now properly freed before a new one is loaded during re-initialization, matching how the main DiT model was already handled.
+- The keyscale field is now a dropdown of the 24 common keys (chromatic notes × major/minor) instead of free text — the backend only accepts English keyscale strings (`"A minor"`), so free-text input in the German UI (`"A-Moll"`) was silently rejected.
+
 ## 📰 News
 
 > 🎵 **Want a faster & more stable experience? Try [acemusic.ai](https://acemusic.ai) — 100% free!**
