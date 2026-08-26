@@ -55,6 +55,13 @@ def compute_mode_ui_updates(mode: str, llm_handler=None, previous_mode: str = "C
     strength_kwargs = {"visible": show_strength, "label": strength_label, "info": strength_info}
     if is_cover:
         strength_kwargs["value"] = 0.0
+    elif previous_mode == "Remix":
+        # Remix forces this slider to 0.0 ("Cover-Staerke"). Leaving Remix
+        # repurposes the same control as "LM-Codes-Staerke" (how closely the
+        # DiT follows the LM's musical plan) - a leftover low/zero value
+        # there silently starves the DiT of guidance and produces near-noise
+        # output instead of an error, so reset to the documented default.
+        strength_kwargs["value"] = 1.0
     strength_update = gr.update(**strength_kwargs)
     cover_noise_update = gr.update(visible=is_cover, value=0.2) if is_cover else gr.update(visible=False)
 
