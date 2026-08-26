@@ -176,6 +176,17 @@ _startup_update_check() {
         return 0
     fi
 
+    # A different hash isn't necessarily behind: local commits ahead of
+    # origin (e.g. on a fork) also produce a mismatch. Only offer to update
+    # when origin actually has commits we don't have.
+    local behind_count
+    behind_count="$(git rev-list --count "HEAD..origin/$branch" 2>/dev/null || echo "0")"
+    if [[ "$behind_count" -eq 0 ]]; then
+        echo "[Update] Local branch has unpushed/ahead commits; nothing to pull from origin."
+        echo
+        return 0
+    fi
+
     echo
     echo "========================================"
     echo "  Update available!"
