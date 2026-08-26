@@ -97,7 +97,7 @@ BATCH_SIZE="${BATCH_SIZE:-}"
 
 # Model settings
 : "${CONFIG_PATH:=--config_path acestep-v15-turbo}"
-: "${LM_MODEL_PATH:=--lm_model_path acestep-5Hz-lm-0.6B}"
+: "${LM_MODEL_PATH:=--lm_model_path acestep-5Hz-lm-1.7B}"
 # OFFLOAD_TO_CPU="--offload_to_cpu true"
 OFFLOAD_TO_CPU="${OFFLOAD_TO_CPU:-}"
 
