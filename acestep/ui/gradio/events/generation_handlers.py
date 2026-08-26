@@ -46,6 +46,7 @@ from .generation.llm_actions import (  # noqa: F401
     transcribe_audio_codes,
     analyze_src_audio,
 )
+from .generation.opencode_text_actions import write_lyrics_with_opencode, write_caption_with_opencode  # noqa: F401
 from .generation.ui_helpers import (  # noqa: F401
     NON_THINK_DCW_DEFAULTS,
     THINK_DCW_DEFAULTS,

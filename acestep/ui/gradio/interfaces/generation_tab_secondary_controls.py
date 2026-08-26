@@ -87,6 +87,11 @@ def build_custom_mode_controls() -> dict[str, Any]:
                                 variant="secondary",
                                 size="sm",
                             )
+                            opencode_caption_btn = gr.Button(
+                                t("generation.opencode_caption_btn"),
+                                variant="secondary",
+                                size="sm",
+                            )
                     with gr.Column(scale=1):
                         lyrics = gr.Textbox(
                             label=t("generation.lyrics_label"),
@@ -106,6 +111,12 @@ def build_custom_mode_controls() -> dict[str, Any]:
                                 size="sm",
                                 scale=2,
                             )
+                            opencode_lyrics_btn = gr.Button(
+                                t("generation.opencode_lyrics_btn"),
+                                variant="secondary",
+                                size="sm",
+                                scale=2,
+                            )
             with gr.Column(scale=1, min_width=80, elem_classes="icon-btn-wrap"):
                 sample_btn = gr.Button(t("generation.sample_btn"), variant="primary", size="lg")
     return {
@@ -113,9 +124,11 @@ def build_custom_mode_controls() -> dict[str, Any]:
         "reference_audio": reference_audio,
         "captions": captions,
         "format_caption_btn": format_caption_btn,
+        "opencode_caption_btn": opencode_caption_btn,
         "lyrics": lyrics,
         "instrumental_checkbox": instrumental_checkbox,
         "format_lyrics_btn": format_lyrics_btn,
+        "opencode_lyrics_btn": opencode_lyrics_btn,
         "sample_btn": sample_btn,
     }
 

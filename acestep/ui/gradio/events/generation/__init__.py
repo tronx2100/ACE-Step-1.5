@@ -45,6 +45,7 @@ from .llm_actions import (
     transcribe_audio_codes,
     analyze_src_audio,
 )
+from .opencode_text_actions import write_lyrics_with_opencode, write_caption_with_opencode
 from .ui_helpers import (
     NON_THINK_DCW_DEFAULTS,
     THINK_DCW_DEFAULTS,

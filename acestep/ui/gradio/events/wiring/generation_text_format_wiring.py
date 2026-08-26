@@ -54,6 +54,40 @@ def register_generation_text_format_handlers(
         outputs=list(auto_checkbox_outputs),
     )
 
+    # ========== Write Lyrics with opencode Button ==========
+    generation_section["opencode_lyrics_btn"].click(
+        fn=gen_h.write_lyrics_with_opencode,
+        inputs=[
+            generation_section["captions"],
+            generation_section["lyrics"],
+        ],
+        outputs=[
+            generation_section["lyrics"],
+            results_section["status_output"],
+        ],
+    ).then(
+        fn=gen_h.uncheck_auto_for_populated_fields,
+        inputs=list(auto_checkbox_inputs),
+        outputs=list(auto_checkbox_outputs),
+    )
+
+    # ========== Write Caption with opencode Button ==========
+    generation_section["opencode_caption_btn"].click(
+        fn=gen_h.write_caption_with_opencode,
+        inputs=[
+            generation_section["captions"],
+            generation_section["lyrics"],
+        ],
+        outputs=[
+            generation_section["captions"],
+            results_section["status_output"],
+        ],
+    ).then(
+        fn=gen_h.uncheck_auto_for_populated_fields,
+        inputs=list(auto_checkbox_inputs),
+        outputs=list(auto_checkbox_outputs),
+    )
+
     # ========== Edit: Copy Current Caption/Lyrics into Source Fields ==========
     # Quick way to bootstrap V_src with the user-level prompt before they
     # edit the top-level fields to define V_tar.
