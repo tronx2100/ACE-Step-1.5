@@ -54,7 +54,7 @@ def compute_mode_ui_updates(mode: str, llm_handler=None, previous_mode: str = "C
         strength_info = t("generation.cover_strength_info")
     strength_kwargs = {"visible": show_strength, "label": strength_label, "info": strength_info}
     if is_cover:
-        strength_kwargs["value"] = 0.0
+        strength_kwargs["value"] = 0.1
     elif previous_mode == "Remix":
         # Remix forces this slider to 0.0 ("Cover-Staerke"). Leaving Remix
         # repurposes the same control as "LM-Codes-Staerke" (how closely the
@@ -63,7 +63,7 @@ def compute_mode_ui_updates(mode: str, llm_handler=None, previous_mode: str = "C
         # output instead of an error, so reset to the documented default.
         strength_kwargs["value"] = 1.0
     strength_update = gr.update(**strength_kwargs)
-    cover_noise_update = gr.update(visible=is_cover, value=0.2) if is_cover else gr.update(visible=False)
+    cover_noise_update = gr.update(visible=is_cover, value=0.12) if is_cover else gr.update(visible=False)
 
     # Think checkbox
     lm_initialized = llm_handler.llm_initialized if llm_handler else False
