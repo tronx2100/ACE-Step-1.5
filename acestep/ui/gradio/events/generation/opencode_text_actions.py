@@ -12,6 +12,7 @@ request.
 """
 
 import json
+import os
 import shutil
 import subprocess
 
@@ -20,6 +21,30 @@ import gradio as gr
 from acestep.ui.gradio.i18n import t
 
 _OPENCODE_TIMEOUT_SECONDS = 180
+
+# Common global-install locations for npm/bun/etc CLIs. The gradio server
+# process doesn't always inherit an interactive shell's PATH (e.g. started
+# from a login shell, a desktop autostart entry, or right after a reboot
+# before any shell has sourced ~/.bashrc), so `opencode` on PATH can't be
+# assumed even when it's installed and works fine in a terminal.
+_OPENCODE_FALLBACK_DIRS = [
+    "~/.npm-global/bin",
+    "~/.bun/bin",
+    "~/.local/bin",
+    "~/go/bin",
+    "/usr/local/bin",
+]
+
+
+def _find_opencode() -> str | None:
+    found = shutil.which("opencode")
+    if found:
+        return found
+    for directory in _OPENCODE_FALLBACK_DIRS:
+        candidate = os.path.join(os.path.expanduser(directory), "opencode")
+        if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    return None
 
 _LYRICS_STRUCTURE_HINT = (
     "Format the lyrics using ACE-Step structure tags on their own line, "
@@ -93,14 +118,15 @@ def _extract_text_from_opencode_json(stdout: str) -> str:
 
 def _run_opencode(prompt: str):
     """Run `opencode run` with *prompt* and return (text_or_none, status_message_or_none)."""
-    if shutil.which("opencode") is None:
+    opencode_path = _find_opencode()
+    if opencode_path is None:
         status_message = t("messages.opencode_not_found")
         gr.Warning(status_message)
         return None, status_message
 
     try:
         result = subprocess.run(
-            ["opencode", "run", "--format", "json", prompt],
+            [opencode_path, "run", "--format", "json", prompt],
             capture_output=True,
             text=True,
             timeout=_OPENCODE_TIMEOUT_SECONDS,
